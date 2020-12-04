@@ -6,18 +6,30 @@ include("./conf.inc.php");
 
 $action=$_REQUEST["id_action"];
 $save=$_REQUEST["save"];
+$remote_session=$_REQUEST["remote_session"];
+if($remote_session!="")
+ {
+   $sr=new SleekshopRequest();
+   $res=$sr->get_user_data($remote_session);
+   $res=json_decode($res);
+   if((string)$res->object=="error") die("PERMISSION_DENIED");
+ }
 if($action=="") $action=1;
 if(SERVER=="" OR LICENCE_USERNAME=="" OR LICENCE_PASSWORD=="" OR APPLICATION_TOKEN=="") $action=2;
 if($save==1) $action=3;
 //When application-page is called
 if($action==1)
 {
+  if($remote_session=="")
+  {
    $token=$_GET["token"];
    $sr=new SleekshopRequest();
    $res=$sr->instant_login($token);
    $res=json_decode($res);
    $status=(string)$res->status;
    if($status!="SUCCESS") die("PERMISSION_DENIED");
+   $remote_session=(string)$res->remote_session;
+  }
    echo "<h3>Welcome to the facebook-feed app for sleekshop (initial-setup) / v 1.0.0 beta</h3>";
    echo "<form method='post' action='index.php?id_action=3&save=1'>
    Api Endpoint<br>
@@ -32,7 +44,8 @@ if($action==1)
    Facebook category id<br>
    <input type='text' name='facebook_category_id' placeholder='Facebook category id' value='".FACEBOOK_CATEGORY_ID."'><br><br>
    Base URL<br>
-   <input type='text' name='base_url' placeholder='Base URL' value='".BASE_URL."'><br><br>";;
+   <input type='text' name='base_url' placeholder='Base URL' value='".BASE_URL."'><br><br>";
+   echo "<input type='hidden' name='remote_session' value='".$remote_session."'>";
    echo "<input type='submit' value='submit'></form>";
 }
 
@@ -53,7 +66,8 @@ if($action==2)
    Facebook category id<br>
    <input type='text' name='facebook_category_id' placeholder='Facebook category id' value='".FACEBOOK_CATEGORY_ID."'><br><br>
    Base URL<br>
-   <input type='text' name='base_url' placeholder='Base URL' value='".BASE_URL."'><br><br>";;
+   <input type='text' name='base_url' placeholder='Base URL' value='".BASE_URL."'><br><br>";
+   echo "<input type='hidden' name='remote_session' value='".$remote_session."'>";
    echo "<input type='submit' value='submit'></form>";
  }
 
@@ -69,7 +83,7 @@ if($action==2)
     $base_url=$_POST["base_url"];
     ConfCtl::CreateConf($api_endpoint,$licence_username,$licence_password,$application_token,$base_url,$facebook_category_id);
     echo "<h3>Welcome to the facebook-feed app for sleekshop / v 1.0.0 beta</h3>";
-    echo "Updated the configuration, click <a href='index.php'>here</a>";
+    echo "Updated the configuration, click <a href='index.php?remote_session=".$remote_session."'>here</a>";
   }
 
  ?>
