@@ -89,7 +89,7 @@ if($action==2)
 
 
  //When configuration is already available
- if($action==3)
+ if($action==4)
   {
     if($remote_session=="")
     {
