@@ -17,6 +17,7 @@ if($remote_session!="")
 if($action=="") $action=1;
 if(SERVER=="" OR LICENCE_USERNAME=="" OR LICENCE_PASSWORD=="" OR APPLICATION_TOKEN=="") $action=2;
 if($save==1) $action=3;
+if(SERVER != "" AND LICENCE_USERNAME != "" AND LICENCE_PASSWORD != "" AND APPLICATION_TOKEN != "") $action=4;
 //When application-page is called
 if($action==1)
 {
@@ -82,6 +83,24 @@ if($action==2)
     $facebook_category_id=$_POST["facebook_category_id"];
     $base_url=$_POST["base_url"];
     ConfCtl::CreateConf($api_endpoint,$licence_username,$licence_password,$application_token,$base_url,$facebook_category_id);
+    echo "<h3>Welcome to the facebook-feed app for sleekshop / v 1.0.0 beta</h3>";
+    echo "Updated the configuration, click <a href='index.php?remote_session=".$remote_session."'>here</a>";
+  }
+
+
+ //When configuration is already available
+ if($action==3)
+  {
+    if($remote_session=="")
+    {
+    $token=$_GET["token"];
+    $sr=new SleekshopRequest();
+    $res=$sr->instant_login($token);
+    $res=json_decode($res);
+    $status=(string)$res->status;
+    if($status!="SUCCESS") die("PERMISSION_DENIED");
+    $remote_session=(string)$res->remote_session;
+    }
     echo "<h3>Welcome to the facebook-feed app for sleekshop / v 1.0.0 beta</h3>";
     echo "Updated the configuration, click <a href='index.php?remote_session=".$remote_session."'>here</a>";
   }
