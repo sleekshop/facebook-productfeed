@@ -1,4 +1,6 @@
 <?php
+header('Content-Type: text/html; charset=utf-8');
+
 include("./vendor/sleekcommerce/init.inc.php");
 include("./vendor/facebook/facebook.inc.php");
 ConfCtl::CheckConf();
